@@ -1,12 +1,13 @@
 let currentAudio = null;
 let isTouched = false; // タッチイベントが先に発火したかを管理するフラグ
+let releaseTimer = null; // 画像を元に戻すためのタイマーID
 
 document.addEventListener('DOMContentLoaded', () => {
     const mahotokeImageButton = document.getElementById('mahotokeImageButton');
 
     const imagePaths = {
-        normal: 'Assets/image/mahotoke_normal.png',   // 通常時の画像
-        clicked: 'Assets/image/mahotoke_clicked.png'  // クリック時の画像
+        normal: 'Assets/image/mahotoke_normal.png',
+        clicked: 'Assets/image/mahotoke_clicked.png'
     };
 
     const soundPath = 'Assets/sound/sound.mp3';
@@ -20,11 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
     mahotokeImageButton.src = imagePaths.normal;
 
     // --- イベントハンドラー関数 ---
-    // ボタンが押されたときの共通処理（音声再生のみ）
     function handleAudioPlay() {
         if (currentAudio) {
             currentAudio.pause();
-            currentAudio.currentTime = 0; // 再生位置を最初に戻す
+            currentAudio.currentTime = 0;
         }
         currentAudio = new Audio(soundPath);
         currentAudio.play().catch(e => {
@@ -32,12 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 画像を切り替える共通処理（押された時）
     function setImageClicked() {
         mahotokeImageButton.src = imagePaths.clicked;
     }
 
-    // 画像を元に戻す共通処理（離された時）
     function setImageNormal() {
         mahotokeImageButton.src = imagePaths.normal;
     }
@@ -46,44 +44,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // PC (マウス) イベント
     mahotokeImageButton.addEventListener('mousedown', () => {
-        setImageClicked(); // マウス押下時に画像を切り替え
-        handleAudioPlay(); // 音を再生
+        setImageClicked();
+        handleAudioPlay();
+        // 短いタイマーを設定し、もしmouseupが来なかったら自動的に元に戻す
+        releaseTimer = setTimeout(setImageNormal, 300); // 300ms後に戻す（調整可能）
     });
 
-    mahotokeImageButton.addEventListener('mouseup', setImageNormal); // マウスボタンを離した時に画像を元に戻す
-    mahotokeImageButton.addEventListener('mouseleave', setImageNormal); // マウスがボタンから離れた時に画像を元に戻す
+    mahotokeImageButton.addEventListener('mouseup', () => {
+        clearTimeout(releaseTimer); // mouseupが正常に来たのでタイマーをクリア
+        setImageNormal();
+    });
+    mahotokeImageButton.addEventListener('mouseleave', () => {
+        clearTimeout(releaseTimer); // mouseleaveが正常に来たのでタイマーをクリア
+        setImageNormal();
+    });
 
     // スマホ (タッチ) イベント
     mahotokeImageButton.addEventListener('touchstart', (e) => {
-        e.preventDefault(); // デフォルトの動作（スクロール、ズームなど）を防止
-        isTouched = true; // タッチイベントが発火したことを示す
-        setImageClicked(); // タッチ開始時に画像を切り替え
-        handleAudioPlay(); // 音を再生
+        e.preventDefault();
+        isTouched = true;
+        setImageClicked();
+        handleAudioPlay();
+        // 短いタイマーを設定し、もしtouchendが来なかったら自動的に元に戻す
+        releaseTimer = setTimeout(setImageNormal, 300); // 300ms後に戻す（調整可能）
     }, { passive: false });
 
     mahotokeImageButton.addEventListener('touchend', (e) => {
-        e.preventDefault(); // デフォルトの動作を防止
-        setImageNormal(); // タッチ終了時に画像を元に戻す
-        isTouched = false; // フラグリセット
+        e.preventDefault();
+        clearTimeout(releaseTimer); // touchendが正常に来たのでタイマーをクリア
+        setImageNormal();
+        isTouched = false;
     }, { passive: false });
 
-    // クリックイベント (マウスとタッチの両方で発火する可能性があるが、
-    // touchstart/touchend が発火した場合、clickは無視するか制御する)
+    // クリックイベント (フォールバック)
     mahotokeImageButton.addEventListener('click', (e) => {
-        // もし直前にtouchstartが発火していたら、clickイベントは無視する
-        // (多くのブラウザではtouchstart後にclickも発火するため、二重処理を防ぐ)
-        if (isTouched) {
+        if (isTouched) { // タッチイベントが発火した場合は無視
             return;
         }
-        // タッチイベントが発火しなかったPCのクリックなどでは、この処理が走る
-        setImageClicked();
-        handleAudioPlay();
-        // 通常のクリックでは、すぐにmouseupが来るので、setImageNormalはmouseupに任せる
-        // または、短い時間で自動的に戻すタイマーを設定することもできますが、
-        // 今回はmouseup/touchendに任せるのがシンプル。
+        // PCクリックの場合、mousedown/mouseupで既に処理されるので、
+        // このclickイベントでは特に画像切り替えは不要かもしれないが、
+        // 念のため画像がclickedになっていないかチェック
+        if (mahotokeImageButton.src !== imagePaths.clicked) {
+             setImageClicked();
+             handleAudioPlay();
+             releaseTimer = setTimeout(setImageNormal, 300); // 300ms後に戻す
+        }
     });
 
-
     // キーボード操作など (PCでのアクセシビリティのため)
-    mahotokeImageButton.addEventListener('blur', setImageNormal);
+    mahotokeImageButton.addEventListener('blur', () => {
+        clearTimeout(releaseTimer); // フォーカスが外れたらタイマーをクリア
+        setImageNormal();
+    });
 });
