@@ -1,20 +1,54 @@
-// Audioオブジェクトを保持する変数を宣言
 let currentAudio = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // ボタン要素を取得
-    const nyanpasuButton = document.getElementById('nyanpasuButton');
+    // 画像ボタン要素を取得
+    const mahotokeImageButton = document.getElementById('mahotokeImageButton');
 
-    // ボタンがクリックされたときの処理
-    nyanpasuButton.addEventListener('click', () => {
-        // 現在再生中の音声があれば停止させる
-        if (currentAudio) {
-            currentAudio.pause();
-            currentAudio.currentTime = 0; // 再生位置を最初に戻す
-        }
+    // 画像パスを定義（GitHubリポジトリ内に配置することを想定）
+    const imagePaths = {
+        normal: 'mahotoke_normal.png',   // 通常時の画像
+        clicked: 'mahotoke_clicked.png'  // クリック時の画像
+    };
+    // もし画像ボタンのファイルもAssets/image/に移動した場合は、以下のように変更
+    /*
+    const imagePaths = {
+        normal: 'Assets/image/mahotoke_normal.png',
+        clicked: 'Assets/image/mahotoke_clicked.png'
+    };
+    */
 
-        // 新しいAudioオブジェクトを作成し、音声を再生
-        currentAudio = new Audio('sound.mp3'); // 音声ファイルのパスを指定
-        currentAudio.play();
-    });
+    // 音声ファイルのパス
+    const soundPath = 'sounds/sound.mp3'; // ここもGitHubリポジトリ内のパス。
+                                       // もしAssets/sound/に移動した場合は 'Assets/sound/sound.mp3' に変更
+    // ...
+    currentAudio = new Audio(soundPath);
+    currentAudio.play();
+
+    // クリック時に画像を切り替え
+    mahotokeImageButton.src = imagePaths.clicked;
+
+    // 音声再生が終わったら画像を元に戻す（任意）
+    currentAudio.onended = () => {
+        mahotokeImageButton.src = imagePaths.normal;
+    };
+});
+
+// マウスが離れた時や、ページのロード時など、
+// クリック状態が解除されたら画像を元に戻す処理も追加できます。
+// 例: マウスボタンを離した時
+mahotokeImageButton.addEventListener('mouseup', () => {
+    if (currentAudio && !currentAudio.paused) {
+        // 音が鳴っている間はclicked画像を維持
+    } else {
+        mahotokeImageButton.src = imagePaths.normal;
+    }
+});
+
+// キーボード操作などでフォーカスが外れた時
+mahotokeImageButton.addEventListener('blur', () => {
+    mahotokeImageButton.src = imagePaths.normal;
+});
+
+// ページのロード時に画像が確実にnormalになるように
+mahotokeImageButton.src = imagePaths.normal;
 });
