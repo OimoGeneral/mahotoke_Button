@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 画像パスを定義（GitHubリポジトリ内に配置することを想定）
     const imagePaths = {
-        normal: 'mahotoke_normal.png',   // 通常時の画像
-        clicked: 'mahotoke_clicked.png'  // クリック時の画像
+        normal: 'Assets/image/mahotoke_normal.png',   // 通常時の画像
+        clicked: 'Assets/image/mahotoke_clicked.png'  // クリック時の画像
     };
     // もし画像ボタンのファイルもAssets/image/に移動した場合は、以下のように変更
     /*
