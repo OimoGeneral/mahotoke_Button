@@ -5,42 +5,41 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Audioオブジェクトは一度だけ生成し、使い回す
     const audio = new Audio('Assets/sound/sound.mp3');
 
-    // --- 処理を関数に分離 ---
-
-    // 押した時の処理（再生 & 縮小）
     const pressButton = () => {
-        // 既にアクティブな場合は処理しない（キーボード長押しなどでの連続発火を防ぐ）
         if (mahotokeButton.classList.contains('button-active')) return;
-
-        mahotokeButton.classList.add('button-active'); // 先にクラスを追加して視覚的反応を速くする
+        mahotokeButton.classList.add('button-active');
         audio.currentTime = 0;
         audio.play().catch(error => console.error("Audio playback failed:", error));
     };
 
-    // 離した時の処理（元のサイズに戻す）
     const releaseButton = () => {
         mahotokeButton.classList.remove('button-active');
     };
 
-    // --- イベントリスナーの再設定 ---
+    // --- イベントリスナー ---
 
-    // 押下時
+    // PCでの押下
     mahotokeButton.addEventListener('mousedown', pressButton);
-    mahotokeButton.addEventListener('touchstart', pressButton, { passive: true }); // passive:trueでスクロール性能を阻害しない
+
+    // 【修正箇所】スマホでの押下
+    mahotokeButton.addEventListener('touchstart', (e) => {
+        // 後続のマウスイベント（mousedown, clickなど）の発火をキャンセルする
+        e.preventDefault();
+        pressButton();
+    }, { passive: false }); // preventDefaultを許可するためにpassiveをfalseに設定
 
     // 離した時
     mahotokeButton.addEventListener('mouseup', releaseButton);
-    mahotokeButton.addEventListener('mouseleave', releaseButton); // カーソルがボタンから外れた場合
+    mahotokeButton.addEventListener('mouseleave', releaseButton);
     mahotokeButton.addEventListener('touchend', releaseButton);
-    mahotokeButton.addEventListener('touchcancel', releaseButton); // タッチが予期せずキャンセルされた場合
+    mahotokeButton.addEventListener('touchcancel', releaseButton);
 
     // キーボード操作
     mahotokeButton.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault(); // Spaceキーでの画面スクロールを防止
+            e.preventDefault();
             pressButton();
         }
     });
