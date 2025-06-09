@@ -1,46 +1,53 @@
-let currentAudio = null;
-
 document.addEventListener('DOMContentLoaded', () => {
-    const mahotokeImageButton = document.getElementById('mahotokeImageButton');
-
-    const soundPath = 'Assets/sound/sound.mp3';
-
-    if (!mahotokeImageButton) {
+    const mahotokeButton = document.getElementById('mahotokeImageButton');
+    if (!mahotokeButton) {
         console.error('Error: mahotokeImageButton element not found!');
         return;
     }
 
-    // --- イベントハンドラー関数 ---
-    // ボタンが押されたときの共通処理（音声再生のみ）
-    function handleAudioPlay() {
-        if (currentAudio) {
-            currentAudio.pause();
-            currentAudio.currentTime = 0; // 再生位置を最初に戻す
-        }
-        currentAudio = new Audio(soundPath);
-        currentAudio.play().catch(e => {
-            console.error("Audio playback failed:", e);
-        });
-    }
+    // Audioオブジェクトは一度だけ生成し、使い回す
+    const audio = new Audio('Assets/sound/sound.mp3');
 
-    // --- イベントリスナー ---
-    // マウスイベントとタッチイベントの両方で音声再生をトリガー
-    // CSSの:activeで画像縮小は処理されます。
+    // --- 処理を関数に分離 ---
 
-    // PC: マウスが押されたら音を鳴らす
-    mahotokeImageButton.addEventListener('mousedown', handleAudioPlay);
+    // 押した時の処理（再生 & 縮小）
+    const pressButton = () => {
+        // 既にアクティブな場合は処理しない（キーボード長押しなどでの連続発火を防ぐ）
+        if (mahotokeButton.classList.contains('button-active')) return;
 
-    // スマホ: タッチが開始されたら音を鳴らす
-    mahotokeImageButton.addEventListener('touchstart', (e) => {
-        // e.preventDefault(); // ★★★ ここを削除 ★★★
-        handleAudioPlay();
-    }, { passive: false }); // passive: false は残しておく（touchstartでpreventDefaultを呼ぶ場合のためだが、残しても問題なし）
+        mahotokeButton.classList.add('button-active'); // 先にクラスを追加して視覚的反応を速くする
+        audio.currentTime = 0;
+        audio.play().catch(error => console.error("Audio playback failed:", error));
+    };
 
-    // キーボード操作での再生（Enter/Spaceキー）
-    mahotokeImageButton.addEventListener('keydown', (e) => {
+    // 離した時の処理（元のサイズに戻す）
+    const releaseButton = () => {
+        mahotokeButton.classList.remove('button-active');
+    };
+
+    // --- イベントリスナーの再設定 ---
+
+    // 押下時
+    mahotokeButton.addEventListener('mousedown', pressButton);
+    mahotokeButton.addEventListener('touchstart', pressButton, { passive: true }); // passive:trueでスクロール性能を阻害しない
+
+    // 離した時
+    mahotokeButton.addEventListener('mouseup', releaseButton);
+    mahotokeButton.addEventListener('mouseleave', releaseButton); // カーソルがボタンから外れた場合
+    mahotokeButton.addEventListener('touchend', releaseButton);
+    mahotokeButton.addEventListener('touchcancel', releaseButton); // タッチが予期せずキャンセルされた場合
+
+    // キーボード操作
+    mahotokeButton.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleAudioPlay();
+            e.preventDefault(); // Spaceキーでの画面スクロールを防止
+            pressButton();
+        }
+    });
+
+    mahotokeButton.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            releaseButton();
         }
     });
 });
