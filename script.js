@@ -1,29 +1,25 @@
 let currentAudio = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 画像ボタン要素を取得
     const mahotokeImageButton = document.getElementById('mahotokeImageButton');
 
-    // 画像パスを定義
     const imagePaths = {
         normal: 'Assets/image/mahotoke_normal.png',   // 通常時の画像
         clicked: 'Assets/image/mahotoke_clicked.png'  // クリック時の画像
     };
 
-    // 音声ファイルのパス
     const soundPath = 'Assets/sound/sound.mp3';
 
-    // mahotokeImageButton が存在することを確認
     if (!mahotokeImageButton) {
         console.error('Error: mahotokeImageButton element not found!');
-        return; // 要素が見つからない場合は処理を中断
+        return;
     }
 
     // 初期設定：ページのロード時に画像が確実にnormalになるように
     mahotokeImageButton.src = imagePaths.normal;
 
-    // ボタンがクリックされたときの処理
-    mahotokeImageButton.addEventListener('click', () => {
+    // ボタンがクリックされたときの処理 (mousedownイベントを使用することで、クリック"開始時"に画像を切り替える)
+    mahotokeImageButton.addEventListener('mousedown', () => { // ★ ここを'mousedown'に変更
         // 現在再生中の音声があれば停止させる
         if (currentAudio) {
             currentAudio.pause();
@@ -33,35 +29,32 @@ document.addEventListener('DOMContentLoaded', () => {
         // 新しいAudioオブジェクトを作成し、音声を再生
         currentAudio = new Audio(soundPath);
         currentAudio.play().catch(e => {
-            // 自動再生ポリシーなどで再生がブロックされた場合の対応
             console.error("Audio playback failed:", e);
-            // ユーザーに再生を促すメッセージを表示するなど
+            // ユーザーに再生を促すメッセージなどを表示するならここに
         });
 
-        // クリック時に画像を切り替え
+        // クリック開始時に画像を切り替え
         mahotokeImageButton.src = imagePaths.clicked;
-
-        // 音声再生が終わったら画像を元に戻す
-        currentAudio.onended = () => {
-            mahotokeImageButton.src = imagePaths.normal;
-        };
     });
 
-    // マウスが離れた時や、ページのロード時など、
-    // クリック状態が解除されたら画像を元に戻す処理
+    // マウスボタンを離したときに画像を元に戻す
     mahotokeImageButton.addEventListener('mouseup', () => {
-        // 音が鳴っている間はclicked画像を維持し、そうでなければnormalに戻す
-        if (currentAudio && !currentAudio.paused) {
-            // 音が鳴っている間はclicked画像を維持
-        } else {
-            mahotokeImageButton.src = imagePaths.normal;
-        }
-    });
-
-    // キーボード操作などでフォーカスが外れた時
-    mahotokeImageButton.addEventListener('blur', () => {
         mahotokeImageButton.src = imagePaths.normal;
     });
 
-    // ここで document.addEventListener('DOMContentLoaded', ... のクロージャが閉じます
+    // マウスがボタンから離れたときに画像を元に戻す（ドラッグしてボタン外で離した場合など）
+    mahotokeImageButton.addEventListener('mouseleave', () => {
+        mahotokeImageButton.src = imagePaths.normal;
+    });
+
+    // (補足) 音声再生が終わったら画像を元に戻す処理は、
+    // mouseupやmouseleaveで画像を戻すため、必須ではなくなりますが、
+    // 長い音声でボタンを押しっぱなしにしない場合に備え残しておいても良いでしょう。
+    // その場合はmousedownイベント内で currentAudio.onended を設定します。
+    // 今回はmouseup/mouseleaveで十分でしょう。
+
+    // キーボード操作などでフォーカスが外れた時（PCでのアクセシビリティのため）
+    mahotokeImageButton.addEventListener('blur', () => {
+        mahotokeImageButton.src = imagePaths.normal;
+    });
 });
