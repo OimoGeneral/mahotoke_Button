@@ -4,31 +4,30 @@ body {
     align-items: center;     /* 垂直方向の中央揃え */
     min-height: 100vh;       /* ビューポートの高さ全体を使う */
     margin: 0;
-    background-color: #f0f0f0; /* 背景色 */
+    /* 背景画像の設定 */
+    background-image: url('Assets/image/background.png'); /* 変更点 */
+    background-size: cover; /* 画面全体を覆うように拡大縮小 */
+    background-position: center; /* 画像を中央に配置 */
+    background-repeat: no-repeat; /* 画像を繰り返さない */
+    background-attachment: fixed; /* 背景を固定（スクロールしても動かない） */
+    color: white; /* ボタンテキストや他の要素の色が背景で見えにくくなる場合 */
 }
 
 .container {
-    text-align: center; /* ボタン内のテキストも中央揃えにする場合 */
+    text-align: center;
 }
 
-#nyanpasuButton {
-    padding: 20px 40px;
-    font-size: 2em;
-    cursor: pointer;
-    background-color: #4CAF50; /* ボタンの色 */
-    color: white;
-    border: none;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    transition: background-color 0.3s ease;
+#mahotokeImageButton {
+    max-width: 300px; /* 画像の最大幅（適宜調整） */
+    height: auto;     /* 高さは自動調整 */
+    cursor: pointer;  /* カーソルをポインターにする */
+    border: none;     /* ボーダーなし */
+    display: block;   /* 中央揃えのためブロック要素にする */
+    margin: 0 auto;   /* 中央揃え */
+    transition: transform 0.1s ease-out; /* クリック時のアニメーション */
 }
 
-#nyanpasuButton:hover {
-    background-color: #45a049;
-}
-
-#nyanpasuButton:active {
-    background-color: #3e8e41;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    transform: translateY(2px); /* クリック時の押し込みエフェクト */
+/* クリック時の押し込みエフェクト（任意） */
+#mahotokeImageButton:active {
+    transform: scale(0.98); /* わずかに縮小 */
 }
