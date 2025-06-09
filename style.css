@@ -52,7 +52,14 @@ body {
     transition: transform 0.1s ease-out; /* 変形を0.1秒かけてスムーズにする */
 }
 
-/* ボタン押下時のエフェクト（マウスのクリック時、タッチ時） */
-#mahotokeImageButton:active {
+/* ...（他のスタイルは変更なし）... */
+
+/* 変更前 */
+/* #mahotokeImageButton:active {
+    transform: scale(0.95);
+} */
+
+/* 変更後: ボタン押下時のエフェクトをクラスで制御 */
+#mahotokeImageButton.button-active {
     transform: scale(0.95); /* 0.95倍に縮小する（調整可能） */
 }
