@@ -1,14 +1,10 @@
 let currentAudio = null;
-let isTouched = false; // タッチイベントが先に発火したかを管理するフラグ
-let releaseTimer = null; // 画像を元に戻すためのタイマーID
 
 document.addEventListener('DOMContentLoaded', () => {
     const mahotokeImageButton = document.getElementById('mahotokeImageButton');
 
-    const imagePaths = {
-        normal: 'Assets/image/mahotoke_normal.png',
-        clicked: 'Assets/image/mahotoke_clicked.png'
-    };
+    // 画像パスはCSSが担当するため、ここからは削除
+    // const imagePaths = { ... };
 
     const soundPath = 'Assets/sound/sound.mp3';
 
@@ -17,14 +13,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // 初期設定：ページのロード時に画像が確実にnormalになるように
-    mahotokeImageButton.src = imagePaths.normal;
+    // 画像の初期設定はHTMLのsrc属性とCSSが担当するため、ここからは削除
+    // mahotokeImageButton.src = imagePaths.normal;
 
     // --- イベントハンドラー関数 ---
+    // ボタンが押されたときの共通処理（音声再生のみ）
     function handleAudioPlay() {
         if (currentAudio) {
             currentAudio.pause();
-            currentAudio.currentTime = 0;
+            currentAudio.currentTime = 0; // 再生位置を最初に戻す
         }
         currentAudio = new Audio(soundPath);
         currentAudio.play().catch(e => {
@@ -32,68 +29,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function setImageClicked() {
-        mahotokeImageButton.src = imagePaths.clicked;
-    }
-
-    function setImageNormal() {
-        mahotokeImageButton.src = imagePaths.normal;
-    }
-
     // --- イベントリスナー ---
+    // マウスイベントとタッチイベントの両方で音声再生をトリガー
+    // 画像の縮小はCSSの:activeに任せるため、setImageClicked/Normalは不要
 
-    // PC (マウス) イベント
-    mahotokeImageButton.addEventListener('mousedown', () => {
-        setImageClicked();
-        handleAudioPlay();
-        // 短いタイマーを設定し、もしmouseupが来なかったら自動的に元に戻す
-        releaseTimer = setTimeout(setImageNormal, 300); // 300ms後に戻す（調整可能）
-    });
-
-    mahotokeImageButton.addEventListener('mouseup', () => {
-        clearTimeout(releaseTimer); // mouseupが正常に来たのでタイマーをクリア
-        setImageNormal();
-    });
-    mahotokeImageButton.addEventListener('mouseleave', () => {
-        clearTimeout(releaseTimer); // mouseleaveが正常に来たのでタイマーをクリア
-        setImageNormal();
-    });
-
-    // スマホ (タッチ) イベント
+    mahotokeImageButton.addEventListener('mousedown', handleAudioPlay); // PC：マウスが押されたら音を鳴らす
     mahotokeImageButton.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        isTouched = true;
-        setImageClicked();
-        handleAudioPlay();
-        // 短いタイマーを設定し、もしtouchendが来なかったら自動的に元に戻す
-        releaseTimer = setTimeout(setImageNormal, 300); // 300ms後に戻す（調整可能）
+        e.preventDefault(); // デフォルトの動作（スクロール、ズーム）を防止
+        handleAudioPlay();  // スマホ：タッチが開始されたら音を鳴らす
     }, { passive: false });
 
-    mahotokeImageButton.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        clearTimeout(releaseTimer); // touchendが正常に来たのでタイマーをクリア
-        setImageNormal();
-        isTouched = false;
-    }, { passive: false });
+    // クリックイベントも念のため残す（フォールバック）
+    mahotokeImageButton.addEventListener('click', handleAudioPlay);
 
-    // クリックイベント (フォールバック)
-    mahotokeImageButton.addEventListener('click', (e) => {
-        if (isTouched) { // タッチイベントが発火した場合は無視
-            return;
-        }
-        // PCクリックの場合、mousedown/mouseupで既に処理されるので、
-        // このclickイベントでは特に画像切り替えは不要かもしれないが、
-        // 念のため画像がclickedになっていないかチェック
-        if (mahotokeImageButton.src !== imagePaths.clicked) {
-             setImageClicked();
-             handleAudioPlay();
-             releaseTimer = setTimeout(setImageNormal, 300); // 300ms後に戻す
+
+    // キーボード操作での再生（オプション）
+    mahotokeImageButton.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { // Enterキーまたはスペースキーで発火
+            e.preventDefault(); // デフォルトのスクロールなどを防止
+            handleAudioPlay();
         }
     });
 
-    // キーボード操作など (PCでのアクセシビリティのため)
-    mahotokeImageButton.addEventListener('blur', () => {
-        clearTimeout(releaseTimer); // フォーカスが外れたらタイマーをクリア
-        setImageNormal();
-    });
+    // 画像の戻し処理もCSSが:activeで自動的に行うため、JavaScriptからは削除
+    // mouseup, mouseleave, touchend, blur などはもはや画像変更のためには不要
+    // （ただし、必要なら他の目的でリスナーを残すことは可能）
 });
