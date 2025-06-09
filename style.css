@@ -1,33 +1,73 @@
-body {
-    display: flex;
-    justify-content: center; /* 水平方向の中央揃え */
-    align-items: center;     /* 垂直方向の中央揃え */
-    min-height: 100vh;       /* ビューポートの高さ全体を使う */
+/* style.css */
+
+/* 全体のリセット（任意だが推奨） */
+*, *::before, *::after {
+    box-sizing: border-box;
     margin: 0;
+    padding: 0;
+}
+
+/* ボディ全体のスタイル */
+body {
+    display: flex;             /* Flexboxを使用し、子要素を配置 */
+    justify-content: center;   /* 水平方向の中央揃え */
+    align-items: center;       /* 垂直方向の中央揃え */
+    min-height: 100vh;         /* ビューポートの高さ全体を使用 */
+    margin: 0;                 /* デフォルトのマージンを削除 */
+    font-family: sans-serif;   /* フォントの指定（任意） */
+    color: #333;               /* デフォルトのテキスト色（背景画像によっては見えにくくなるため変更） */
+
     /* 背景画像の設定 */
-    background-image: url('Assets/image/background.png'); /* 変更点 */
-    background-size: cover; /* 画面全体を覆うように拡大縮小 */
-    background-position: center; /* 画像を中央に配置 */
+    background-image: url('Assets/image/background.png'); /* 指定された背景画像のパス */
+    background-size: cover;    /* 画面全体を覆うように画像を拡大縮小 */
+    background-position: center; /* 画像を常に中央に配置 */
     background-repeat: no-repeat; /* 画像を繰り返さない */
-    background-attachment: fixed; /* 背景を固定（スクロールしても動かない） */
-    color: white; /* ボタンテキストや他の要素の色が背景で見えにくくなる場合 */
+    background-attachment: fixed; /* 背景を固定し、スクロールしても動かないようにする */
 }
 
+/* コンテンツを中央に配置するためのコンテナ（flexboxの代替にもなる） */
 .container {
-    text-align: center;
+    text-align: center; /* ボタン内のテキスト（もしあれば）を中央揃えにする場合 */
+    /* 必要に応じてパディングや最大幅を追加 */
+    max-width: 90%;
+    padding: 20px;
 }
 
+/* 「まほとけボタン」画像ボタンのスタイル */
 #mahotokeImageButton {
-    max-width: 300px; /* 画像の最大幅（適宜調整） */
-    height: auto;     /* 高さは自動調整 */
-    cursor: pointer;  /* カーソルをポインターにする */
-    border: none;     /* ボーダーなし */
-    display: block;   /* 中央揃えのためブロック要素にする */
-    margin: 0 auto;   /* 中央揃え */
-    transition: transform 0.1s ease-out; /* クリック時のアニメーション */
+    max-width: 300px; /* 画像の最大幅（適宜調整してください） */
+    width: 100%;      /* 親要素の幅に合わせて可変 */
+    height: auto;     /* 高さは幅に比例して自動調整 */
+    cursor: pointer;  /* マウスカーソルをポインターにする */
+    border: none;     /* ボーダーを削除 */
+    display: block;   /* 中央揃えのためにブロック要素にする */
+    margin: 0 auto;   /* 左右マージンを自動で設定し、水平方向に中央揃え */
+    user-select: none; /* テキスト選択を無効にする（画像なので通常不要だが念のため） */
+    -webkit-touch-callout: none; /* iOSでリンク長押し時に表示されるメニューを無効化 */
+    -webkit-user-select: none;   /* iOSでのテキスト選択を無効化 */
+    -khtml-user-select: none;    /* 旧ブラウザ向け */
+    -moz-user-select: none;      /* Firefox向け */
+    -ms-user-select: none;       /* IE/Edge向け */
+
+
+    /* アニメーション：押下時の縮小エフェクト */
+    transition: transform 0.1s ease-out; /* 変形をスムーズにする */
 }
 
-/* クリック時の押し込みエフェクト（任意） */
+/* ボタン押下時のエフェクト（mousedown, touchstart時に適用される） */
+/* JavaScriptでsrcを切り替えるため、ここでは見た目の変化に限定 */
 #mahotokeImageButton:active {
-    transform: scale(0.98); /* わずかに縮小 */
+    transform: scale(0.98); /* わずかに縮小する */
 }
+
+/* 補足：もし画像自体をCSSで切り替える場合は以下のようになる */
+/* ただし、これはJavaScriptでのsrc変更と競合しないように注意が必要 */
+/*
+#mahotokeImageButton {
+    content: url('Assets/image/mahotoke_normal.png');
+    transition: content 0.1s ease-out;
+}
+#mahotokeImageButton:active {
+    content: url('Assets/image/mahotoke_clicked.png');
+}
+*/
