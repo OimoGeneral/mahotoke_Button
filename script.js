@@ -32,12 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // スマホ: タッチが開始されたら音を鳴らす
     mahotokeImageButton.addEventListener('touchstart', (e) => {
-        e.preventDefault(); // デフォルトの動作（スクロール、ズーム）を防止
+        // e.preventDefault(); // ★★★ ここを削除 ★★★
         handleAudioPlay();
-    }, { passive: false });
-
-    // クリックイベントは削除（これが二重再生の原因になっている可能性が高い）
-    // mahotokeImageButton.addEventListener('click', handleAudioPlay);
+    }, { passive: false }); // passive: false は残しておく（touchstartでpreventDefaultを呼ぶ場合のためだが、残しても問題なし）
 
     // キーボード操作での再生（Enter/Spaceキー）
     mahotokeImageButton.addEventListener('keydown', (e) => {
@@ -46,8 +43,4 @@ document.addEventListener('DOMContentLoaded', () => {
             handleAudioPlay();
         }
     });
-
-    // 押したときに画像が小さくなるのはCSSの:activeで自動的に処理されるため、
-    // JavaScript側でsetImageNormalなどを呼ぶ必要はありません。
-    // そのため、mouseup, mouseleave, touchend, blur のリスナーも音声再生や画像変更のためには不要です。
 });
