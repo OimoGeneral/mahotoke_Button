@@ -18,7 +18,7 @@ body {
     color: #333;               /* デフォルトのテキスト色（背景画像によっては見えにくくなるため変更） */
 
     /* 背景画像の設定 */
-    background-image: url('Assets/image/background.png'); /* 指定された背景画像のパス */
+    background-image: url('Assets/image/background.webp'); /* 指定された背景画像のパス */
     background-size: cover;    /* 画面全体を覆うように画像を拡大縮小 */
     background-position: center; /* 画像を常に中央に配置 */
     background-repeat: no-repeat; /* 画像を繰り返さない */
