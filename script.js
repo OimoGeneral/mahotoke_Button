@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     */
 
     // 音声ファイルのパス
-    const soundPath = 'sound/sound.mp3'; // ここもGitHubリポジトリ内のパス。
+    const soundPath = 'Assets/sound/sound.mp3'; // ここもGitHubリポジトリ内のパス。
                                        // もしAssets/sound/に移動した場合は 'Assets/sound/sound.mp3' に変更
     // ...
     currentAudio = new Audio(soundPath);
