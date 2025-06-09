@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const mahotokeImageButton = document.getElementById('mahotokeImageButton');
 
     const imagePaths = {
-        normal: 'Assets/image/mahotoke_normal.png',   // 通常時の画像
-        clicked: 'Assets/image/mahotoke_clicked.png'  // クリック時の画像
+        normal: 'Assets/image/mahotoke_normal.png',
+        clicked: 'Assets/image/mahotoke_clicked.png'
     };
 
     const soundPath = 'Assets/sound/sound.mp3';
@@ -18,67 +18,60 @@ document.addEventListener('DOMContentLoaded', () => {
     // 初期設定：ページのロード時に画像が確実にnormalになるように
     mahotokeImageButton.src = imagePaths.normal;
 
-    // --- PC (マウス) イベント ---
-    // マウスボタンが押されたときの処理
-    mahotokeImageButton.addEventListener('mousedown', () => {
-        handleButtonPress();
-    });
-
-    // マウスボタンを離したときに画像を元に戻す
-    mahotokeImageButton.addEventListener('mouseup', () => {
-        handleButtonRelease();
-    });
-
-    // マウスがボタンから離れたときに画像を元に戻す
-    mahotokeImageButton.addEventListener('mouseleave', () => {
-        handleButtonRelease();
-    });
-
-    // --- スマホ (タッチ) イベント ---
-    // タッチが開始されたときの処理
-    mahotokeImageButton.addEventListener('touchstart', (e) => {
-        e.preventDefault(); // デフォルトの動作（スクロールなど）を防止
-        handleButtonPress();
-    });
-
-    // タッチが終了したときに画像を元に戻す
-    mahotokeImageButton.addEventListener('touchend', (e) => {
-        e.preventDefault(); // デフォルトの動作を防止
-        handleButtonRelease();
-    });
-
-    // キーボード操作などでフォーカスが外れた時（PCでのアクセシビリティのため）
-    mahotokeImageButton.addEventListener('blur', () => {
-        handleButtonRelease(); // フォーカスが外れたら画像を戻す
-    });
-
-    // --- ヘルパー関数 ---
-    // ボタンが押されたときの共通処理
+    // --- イベントハンドラー関数 ---
     function handleButtonPress() {
         // 現在再生中の音声があれば停止させる
         if (currentAudio) {
             currentAudio.pause();
-            currentAudio.currentTime = 0; // 再生位置を最初に戻す
+            currentAudio.currentTime = 0;
         }
 
         // 新しいAudioオブジェクトを作成し、音声を再生
         currentAudio = new Audio(soundPath);
         currentAudio.play().catch(e => {
             console.error("Audio playback failed:", e);
-            // ユーザーに再生を促すメッセージなどを表示するならここに
         });
 
         // クリック開始時に画像を切り替え
         mahotokeImageButton.src = imagePaths.clicked;
     }
 
-    // ボタンが離されたときの共通処理
     function handleButtonRelease() {
         mahotokeImageButton.src = imagePaths.normal;
     }
 
-    // （補足）音声再生が終わったら画像を元に戻す処理は、
-    // mouseup/touchend/mouseleaveで画像を戻すため、必須ではありませんが、
-    // 長い音声でボタンを押しっぱなしにしない場合に備え残しておいても良いでしょう。
-    // その場合は handleButtonPress() 内で currentAudio.onended を設定します。
+    // --- イベントリスナー ---
+
+    // PC (マウス) イベント
+    mahotokeImageButton.addEventListener('mousedown', handleButtonPress);
+    mahotokeImageButton.addEventListener('mouseup', handleButtonRelease);
+    mahotokeImageButton.addEventListener('mouseleave', handleButtonRelease); // マウスが要素から離れた時
+
+    // スマホ (タッチ) イベント
+    // passive: false は、preventDefault() が呼ばれることをブラウザに知らせるため
+    // タッチイベントのデリバリーを最適化するが、ここではpreventDefaultを使いたい
+    mahotokeImageButton.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // デフォルトの動作（スクロール、ズーム）を防止
+        handleButtonPress();
+    }, { passive: false });
+
+    mahotokeImageButton.addEventListener('touchend', (e) => {
+        e.preventDefault(); // デフォルトの動作を防止
+        handleButtonRelease();
+    }, { passive: false });
+
+    // キーボード操作など (PCでのアクセシビリティのため)
+    mahotokeImageButton.addEventListener('blur', handleButtonRelease);
+
+    // クリックイベントの追加 (フォールバックとして)
+    // touchstart/touchend が発火しない環境や、一部の特殊なケースでの対策
+    mahotokeImageButton.addEventListener('click', (e) => {
+        // タッチイベントが既に処理していれば何もしない
+        // または、音声再生がまだ行われていない場合にのみ実行
+        if (!currentAudio || currentAudio.paused) {
+            handleButtonPress();
+            handleButtonRelease(); // クリックイベントは押して離す一連の動作なので、両方呼ぶ
+        }
+    });
+
 });
