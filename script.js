@@ -3,18 +3,12 @@ let currentAudio = null;
 document.addEventListener('DOMContentLoaded', () => {
     const mahotokeImageButton = document.getElementById('mahotokeImageButton');
 
-    // 画像パスはCSSが担当するため、ここからは削除
-    // const imagePaths = { ... };
-
     const soundPath = 'Assets/sound/sound.mp3';
 
     if (!mahotokeImageButton) {
         console.error('Error: mahotokeImageButton element not found!');
         return;
     }
-
-    // 画像の初期設定はHTMLのsrc属性とCSSが担当するため、ここからは削除
-    // mahotokeImageButton.src = imagePaths.normal;
 
     // --- イベントハンドラー関数 ---
     // ボタンが押されたときの共通処理（音声再生のみ）
@@ -31,27 +25,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- イベントリスナー ---
     // マウスイベントとタッチイベントの両方で音声再生をトリガー
-    // 画像の縮小はCSSの:activeに任せるため、setImageClicked/Normalは不要
+    // CSSの:activeで画像縮小は処理されます。
 
-    mahotokeImageButton.addEventListener('mousedown', handleAudioPlay); // PC：マウスが押されたら音を鳴らす
+    // PC: マウスが押されたら音を鳴らす
+    mahotokeImageButton.addEventListener('mousedown', handleAudioPlay);
+
+    // スマホ: タッチが開始されたら音を鳴らす
     mahotokeImageButton.addEventListener('touchstart', (e) => {
         e.preventDefault(); // デフォルトの動作（スクロール、ズーム）を防止
-        handleAudioPlay();  // スマホ：タッチが開始されたら音を鳴らす
+        handleAudioPlay();
     }, { passive: false });
 
-    // クリックイベントも念のため残す（フォールバック）
-    mahotokeImageButton.addEventListener('click', handleAudioPlay);
+    // クリックイベントは削除（これが二重再生の原因になっている可能性が高い）
+    // mahotokeImageButton.addEventListener('click', handleAudioPlay);
 
-
-    // キーボード操作での再生（オプション）
+    // キーボード操作での再生（Enter/Spaceキー）
     mahotokeImageButton.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { // Enterキーまたはスペースキーで発火
-            e.preventDefault(); // デフォルトのスクロールなどを防止
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
             handleAudioPlay();
         }
     });
 
-    // 画像の戻し処理もCSSが:activeで自動的に行うため、JavaScriptからは削除
-    // mouseup, mouseleave, touchend, blur などはもはや画像変更のためには不要
-    // （ただし、必要なら他の目的でリスナーを残すことは可能）
+    // 押したときに画像が小さくなるのはCSSの:activeで自動的に処理されるため、
+    // JavaScript側でsetImageNormalなどを呼ぶ必要はありません。
+    // そのため、mouseup, mouseleave, touchend, blur のリスナーも音声再生や画像変更のためには不要です。
 });
