@@ -25,10 +25,9 @@ body {
     background-attachment: fixed; /* 背景を固定し、スクロールしても動かないようにする */
 }
 
-/* コンテンツを中央に配置するためのコンテナ（flexboxの代替にもなる） */
+/* コンテンツを中央に配置するためのコンテナ */
 .container {
     text-align: center; /* ボタン内のテキスト（もしあれば）を中央揃えにする場合 */
-    /* 必要に応じてパディングや最大幅を追加 */
     max-width: 90%;
     padding: 20px;
 }
@@ -49,25 +48,11 @@ body {
     -moz-user-select: none;      /* Firefox向け */
     -ms-user-select: none;       /* IE/Edge向け */
 
-
-    /* アニメーション：押下時の縮小エフェクト */
-    transition: transform 0.1s ease-out; /* 変形をスムーズにする */
+    /* アニメーション：縮小エフェクトをスムーズにする */
+    transition: transform 0.1s ease-out; /* 変形を0.1秒かけてスムーズにする */
 }
 
-/* ボタン押下時のエフェクト（mousedown, touchstart時に適用される） */
-/* JavaScriptでsrcを切り替えるため、ここでは見た目の変化に限定 */
+/* ボタン押下時のエフェクト（マウスのクリック時、タッチ時） */
 #mahotokeImageButton:active {
-    transform: scale(0.98); /* わずかに縮小する */
+    transform: scale(0.95); /* 0.95倍に縮小する（調整可能） */
 }
-
-/* 補足：もし画像自体をCSSで切り替える場合は以下のようになる */
-/* ただし、これはJavaScriptでのsrc変更と競合しないように注意が必要 */
-/*
-#mahotokeImageButton {
-    content: url('Assets/image/mahotoke_normal.png');
-    transition: content 0.1s ease-out;
-}
-#mahotokeImageButton:active {
-    content: url('Assets/image/mahotoke_clicked.png');
-}
-*/
