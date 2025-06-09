@@ -1,0 +1,34 @@
+body {
+    display: flex;
+    justify-content: center; /* 水平方向の中央揃え */
+    align-items: center;     /* 垂直方向の中央揃え */
+    min-height: 100vh;       /* ビューポートの高さ全体を使う */
+    margin: 0;
+    background-color: #f0f0f0; /* 背景色 */
+}
+
+.container {
+    text-align: center; /* ボタン内のテキストも中央揃えにする場合 */
+}
+
+#nyanpasuButton {
+    padding: 20px 40px;
+    font-size: 2em;
+    cursor: pointer;
+    background-color: #4CAF50; /* ボタンの色 */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: background-color 0.3s ease;
+}
+
+#nyanpasuButton:hover {
+    background-color: #45a049;
+}
+
+#nyanpasuButton:active {
+    background-color: #3e8e41;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    transform: translateY(2px); /* クリック時の押し込みエフェクト */
+}
