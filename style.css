@@ -1,6 +1,6 @@
 /* style.css */
 
-/* 全体のリセット（任意だが推奨） */
+/* 全体のリセット */
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
@@ -18,7 +18,7 @@ body {
     color: #333;               /* デフォルトのテキスト色（背景画像によっては見えにくくなるため変更） */
 
     /* 背景画像の設定 */
-    background-image: url('Assets/image/background.webp'); /* 指定された背景画像のパス */
+    background-image: url('Assets/image/background.webp'); /* 背景画像のパス */
     background-size: cover;    /* 画面全体を覆うように画像を拡大縮小 */
     background-position: center; /* 画像を常に中央に配置 */
     background-repeat: no-repeat; /* 画像を繰り返さない */
@@ -52,14 +52,7 @@ body {
     transition: transform 0.1s ease-out; /* 変形を0.1秒かけてスムーズにする */
 }
 
-/* ...（他のスタイルは変更なし）... */
-
-/* 変更前 */
-/* #mahotokeImageButton:active {
-    transform: scale(0.95);
-} */
-
-/* 変更後: ボタン押下時のエフェクトをクラスで制御 */
+/* ボタン押下時のエフェクトをクラスで制御 */
 #mahotokeImageButton.button-active {
-    transform: scale(0.95); /* 0.95倍に縮小する（調整可能） */
+    transform: scale(0.95); /* 0.95倍に縮小する */
 }
