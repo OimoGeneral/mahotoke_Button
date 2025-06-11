@@ -57,7 +57,7 @@ body {
     transform: scale(0.95); /* 0.95倍に縮小する */
 }
 
-/* --- 最終版クリックエフェクトのスタイル --- */
+/* --- クリックエフェクトのスタイル --- */
 .advanced-click-effect {
     position: fixed;
     pointer-events: none;
@@ -141,7 +141,7 @@ body {
     80% { opacity: 1; } /* 0.5s * 0.8 = 0.4s は表示 */
     100% { opacity: 0; } /* 残りの0.1sで消える */
 }
-/* ↑上記を統合して１つのアニメーションにする。ユーザーの要望通り残存時間0.25秒とする */
+/* ↑上記を統合して１つのアニメーションにする。残存時間0.25秒とする */
 @keyframes comet-flight-and-fade {
     0% {
         transform: rotate(var(--start-angle));
