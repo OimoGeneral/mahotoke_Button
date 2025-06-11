@@ -56,3 +56,147 @@ body {
 #mahotokeImageButton.button-active {
     transform: scale(0.95); /* 0.95倍に縮小する */
 }
+
+/* --- 最終版クリックエフェクトのスタイル --- */
+.advanced-click-effect {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.gradient-ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0px;
+    height: 0px;
+    border-radius: 50%;
+    /* 色を統一 */
+    background: radial-gradient(circle, rgba(193, 238, 255, 0.0) 0%, rgba(193, 238, 255, 0.5) 100%);
+    animation: ripple-expand 0.4s ease-out forwards;
+}
+
+.svg-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow: visible;
+}
+
+/* ▼▼▼【彗星（円弧）のスタイル】▼▼▼ */
+.drawing-comet {
+    fill: transparent;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    transform-origin: center center;
+    /* 新しいアニメーションを適用 */
+    animation: comet-flight 0.5s ease-out forwards;
+    animation-delay: 0.15s; /* 波紋の少し後に開始 */
+}
+
+.effect-triangle {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: var(--size, 8px) solid transparent;
+    border-right: var(--size, 8px) solid transparent;
+    /* 色を統一 */
+    border-bottom: calc(var(--size, 8px) * 1.5) solid #c1eeff;
+    animation: triangle-anime 1.0s ease-out forwards;
+}
+
+
+/* --- 各アニメーションの定義 --- */
+
+/* 彗星が180度回転し、フェードアウトするアニメーション */
+@keyframes comet-flight {
+    from {
+        transform: rotate(var(--start-angle));
+        opacity: 1;
+    }
+    to {
+        /* 反時計回りに180度回転 */
+        transform: rotate(calc(var(--start-angle) - 180deg));
+        /* 回転しきった後、指定の残存時間で消える */
+        opacity: 0;
+        animation-timing-function: cubic-bezier(0.5, 1, 0.89, 1); /*
+        これはCSSの書き方として正しくない。opacityは別のアニメーションで制御すべき
+        だが、単純化のためにこう書く。実際にはopacityはtoで0になるだけ
+        */
+    }
+}
+/* opacityを別で制御するほうがより正確 */
+@keyframes comet-flight {
+    from {
+        transform: rotate(var(--start-angle));
+    }
+    to {
+        transform: rotate(calc(var(--start-angle) - 180deg));
+    }
+}
+@keyframes comet-fade {
+    0% { opacity: 1; }
+    80% { opacity: 1; } /* 0.5s * 0.8 = 0.4s は表示 */
+    100% { opacity: 0; } /* 残りの0.1sで消える */
+}
+/* ↑上記を統合して１つのアニメーションにする。ユーザーの要望通り残存時間0.25秒とする */
+@keyframes comet-flight-and-fade {
+    0% {
+        transform: rotate(var(--start-angle));
+        opacity: 1;
+    }
+    /* 0.5秒かけて半周 */
+    100% {
+        transform: rotate(calc(var(--start-angle) - 180deg));
+        opacity: 0;
+    }
+}
+/* 描画0.5秒、残存0.25秒。合計0.75秒 */
+@keyframes comet-flight-and-fade-v2 {
+    0% {
+        transform: rotate(var(--start-angle));
+        opacity: 1;
+    }
+    /* 66%地点（0.5秒）で半周完了 */
+    66% {
+        transform: rotate(calc(var(--start-angle) - 180deg));
+        opacity: 1;
+    }
+    /* 100%地点（0.75秒）で完全に消える */
+    100% {
+        transform: rotate(calc(var(--start-angle) - 180deg));
+        opacity: 0;
+    }
+}
+/* drawing-cometに適用する最終版のアニメーション */
+.drawing-comet {
+    ...
+    animation: comet-flight-and-fade-v2 0.75s ease-out forwards;
+    ...
+}
+
+
+@keyframes ripple-expand {
+    from { width: 0; height: 0; opacity: 1; }
+    to { width: 150px; height: 150px; opacity: 0; }
+}
+
+@keyframes triangle-anime {
+    0% {
+        opacity: 1;
+        transform: scale(0.5) rotate(var(--r-from, 0deg));
+        border-bottom-color: #c1eeff;
+    }
+    30% {
+        transform: scale(1.2) rotate(var(--r-from, 0deg));
+        border-bottom-color: #ffffff;
+        filter: drop-shadow(0 0 10px white);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0) rotate(var(--r-to, 360deg));
+        border-bottom-color: rgba(193, 238, 255, 0.5);
+    }
+}
