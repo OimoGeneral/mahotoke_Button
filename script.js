@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => {
             container.remove();
-        }, 1200);
+        }, 500);
     }
 
     document.addEventListener('click', (e) => { createAdvancedEffect(e.clientX, e.clientY); });
