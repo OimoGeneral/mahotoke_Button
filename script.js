@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 音声ファイルリストの自動生成 ---
     // soundフォルダにある音声ファイルの総数をここに設定してください。
     // 例: sound1.mp3からsound80.mp3まである場合は「80」と入力します。
-    const totalSounds = 144;
+    const totalSounds = 255;
 
     const soundFiles = [];
     for (let i = 1; i <= totalSounds; i++) {
