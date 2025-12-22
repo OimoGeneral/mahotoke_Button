@@ -280,3 +280,16 @@ body {
     width: auto;
     user-select: none;
 }
+
+/* モバイル向け調整 */
+@media (max-width: 480px) {
+    .counter {
+        min-height: 60px;
+        padding: 5px 12px;
+        gap: 1px;
+    }
+
+    .counter-digit {
+        height: 50px;
+    }
+}
