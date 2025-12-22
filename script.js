@@ -40,6 +40,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- カウンターの処理 ---
     const counterContainer = document.getElementById('counter-container');
+    let currentCount = 0; // ローカルで状態を管理
+    const digitImages = []; // プリロード用
+
+    // 数字画像のプリロード
+    for (let i = 0; i <= 9; i++) {
+        const img = new Image();
+        img.src = `Assets/image/${i}.png`;
+        digitImages.push(img);
+    }
+
     // --- 公開カウンタ（合算） ---
     // GitHub Pages側（このHTML）ではサーバー処理ができないため、
     // Cloudflare Workers などのAPIを用意し、そこへGET/POSTします。
@@ -48,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function updateCounterUI(count) {
         if (!counterContainer) return;
+        currentCount = count; // 内部状態を更新
         counterContainer.innerHTML = '';
         const countStr = count.toString().padStart(5, '0');
         for (const digit of countStr) {
@@ -72,10 +83,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function incrementCounter() {
+        // 楽観的更新: サーバーの結果を待たずにUIを増やす
+        updateCounterUI(currentCount + 1);
+
         try {
             const response = await fetch(COUNTER_API_URL, { method: 'POST' });
             if (response.ok) {
                 const data = await response.json();
+                // サーバーの正確な値で同期（誤差があれば修正される）
                 updateCounterUI(data.count);
             }
         } catch (error) {
@@ -203,7 +218,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.addEventListener('click', (e) => { createAdvancedEffect(e.clientX, e.clientY); });
-    document.addEventListener('touchstart', (e) => { const touch = e.touches[0]; createAdvancedEffect(touch.clientX, touch.clientY); }, { passive: true });
+    document.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        createAdvancedEffect(touch.clientX, touch.clientY);
+    }, { passive: true });
 
     // --- 初期化 ---
     prepareNextSound();
