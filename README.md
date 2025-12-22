@@ -28,7 +28,8 @@
    * ボタン画像にrole="button", tabindex="0", alt属性を設定し、キーボード操作やスクリーンリーダーへの配慮を行う。
 4. 使用技術・アーキテクチャ
  * 技術スタック: HTML5, CSS3, JavaScript (ES6+)
- * アーキテクチャ: サーバーサイドの処理を必要としない、完全にクライアントサイドで完結する静的サイト。
+ * アーキテクチャ: 基本はクライアントサイドで完結する静的サイト。
+   * ただし「公開カウンタ（合算）」を有効化する場合のみ、外部API（Cloudflare Workers + D1 など）を利用する。
  * ホスティング: GitHub Pages, Vercel, Netlifyなど、任意の静的サイトホスティングサービスで展開可能。
 5. ファイル構成
 / (プロジェクトのルートディレクトリ)
@@ -43,4 +44,22 @@
         ├── sound1.mp3
         ├── sound2.mp3
         └── ... (音声ファイルは将来的に追加・変更される)
+
+6. 公開カウンタ（合算）の有効化（Cloudflare Workers + D1）
+
+本リポジトリには、公開カウンタ用の Worker が `worker/` に同梱されています。
+
+6.1. Cloudflare 側でやること（概要）
+1) D1 データベースを作成
+2) `worker/schema.sql` を適用（テーブル作成）
+3) Worker をデプロイ
+
+6.2. 設定（最低限）
+* `worker/wrangler.toml` の `database_id` を作成したD1のIDに差し替える
+* `worker/wrangler.toml` の `ALLOW_ORIGIN` を GitHub Pages の origin にする
+  * 例: `https://username.github.io`（パスは含めない）
+
+6.3. フロント側（GitHub Pages）
+`index.html` の `window.__COUNTER_API_URL__` を、デプロイ後の Worker URL に差し替える。
+例: `https://mahotoke-counter.<your-subdomain>.workers.dev/counter`
 

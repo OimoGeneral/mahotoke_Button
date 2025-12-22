@@ -1,7 +1,9 @@
 /* style.css */
 
 /* 全体のリセット */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -9,52 +11,80 @@
 
 /* ボディ全体のスタイル */
 body {
-    display: flex;             /* Flexboxを使用し、子要素を配置 */
-    justify-content: center;   /* 水平方向の中央揃え */
-    align-items: center;       /* 垂直方向の中央揃え */
-    min-height: 100vh;         /* ビューポートの高さ全体を使用 */
-    margin: 0;                 /* デフォルトのマージンを削除 */
-    font-family: sans-serif;   /* フォントの指定（任意） */
-    color: #333;               /* デフォルトのテキスト色（背景画像によっては見えにくくなるため変更） */
+    display: flex;
+    /* Flexboxを使用し、子要素を配置 */
+    justify-content: center;
+    /* 水平方向の中央揃え */
+    align-items: center;
+    /* 垂直方向の中央揃え */
+    min-height: 100vh;
+    /* ビューポートの高さ全体を使用 */
+    margin: 0;
+    /* デフォルトのマージンを削除 */
+    font-family: sans-serif;
+    /* フォントの指定（任意） */
+    color: #333;
+    /* デフォルトのテキスト色（背景画像によっては見えにくくなるため変更） */
 
     /* 背景画像の設定 */
-    background-image: url('Assets/image/background.webp'); /* 背景画像のパス */
-    background-size: cover;    /* 画面全体を覆うように画像を拡大縮小 */
-    background-position: center; /* 画像を常に中央に配置 */
-    background-repeat: no-repeat; /* 画像を繰り返さない */
-    background-attachment: fixed; /* 背景を固定し、スクロールしても動かないようにする */
+    background-image: url('Assets/image/background.webp');
+    /* 背景画像のパス */
+    background-size: cover;
+    /* 画面全体を覆うように画像を拡大縮小 */
+    background-position: center;
+    /* 画像を常に中央に配置 */
+    background-repeat: no-repeat;
+    /* 画像を繰り返さない */
+    background-attachment: fixed;
+    /* 背景を固定し、スクロールしても動かないようにする */
 }
 
 /* コンテンツを中央に配置するためのコンテナ */
 .container {
-    text-align: center; /* ボタン内のテキスト（もしあれば）を中央揃えにする場合 */
+    text-align: center;
+    /* ボタン内のテキスト（もしあれば）を中央揃えにする場合 */
     max-width: 90%;
     padding: 20px;
 }
 
 /* 「まほとけボタン」画像ボタンのスタイル */
 #mahotokeImageButton {
-    max-width: 300px; /* 画像の最大幅（適宜調整してください） */
-    width: 100%;      /* 親要素の幅に合わせて可変 */
-    height: auto;     /* 高さは幅に比例して自動調整 */
-    cursor: pointer;  /* マウスカーソルをポインターにする */
-    border: none;     /* ボーダーを削除 */
-    display: block;   /* 中央揃えのためにブロック要素にする */
-    margin: 0 auto;   /* 左右マージンを自動で設定し、水平方向に中央揃え */
-    user-select: none; /* テキスト選択を無効にする（画像なので通常不要だが念のため） */
-    -webkit-touch-callout: none; /* iOSでリンク長押し時に表示されるメニューを無効化 */
-    -webkit-user-select: none;   /* iOSでのテキスト選択を無効化 */
-    -khtml-user-select: none;    /* 旧ブラウザ向け */
-    -moz-user-select: none;      /* Firefox向け */
-    -ms-user-select: none;       /* IE/Edge向け */
+    max-width: 300px;
+    /* 画像の最大幅（適宜調整してください） */
+    width: 100%;
+    /* 親要素の幅に合わせて可変 */
+    height: auto;
+    /* 高さは幅に比例して自動調整 */
+    cursor: pointer;
+    /* マウスカーソルをポインターにする */
+    border: none;
+    /* ボーダーを削除 */
+    display: block;
+    /* 中央揃えのためにブロック要素にする */
+    margin: 0 auto;
+    /* 左右マージンを自動で設定し、水平方向に中央揃え */
+    user-select: none;
+    /* テキスト選択を無効にする（画像なので通常不要だが念のため） */
+    -webkit-touch-callout: none;
+    /* iOSでリンク長押し時に表示されるメニューを無効化 */
+    -webkit-user-select: none;
+    /* iOSでのテキスト選択を無効化 */
+    -khtml-user-select: none;
+    /* 旧ブラウザ向け */
+    -moz-user-select: none;
+    /* Firefox向け */
+    -ms-user-select: none;
+    /* IE/Edge向け */
 
     /* アニメーション：縮小エフェクトをスムーズにする */
-    transition: transform 0.1s ease-out; /* 変形を0.1秒かけてスムーズにする */
+    transition: transform 0.1s ease-out;
+    /* 変形を0.1秒かけてスムーズにする */
 }
 
 /* ボタン押下時のエフェクトをクラスで制御 */
 #mahotokeImageButton.button-active {
-    transform: scale(0.95); /* 0.95倍に縮小する */
+    transform: scale(0.95);
+    /* 0.95倍に縮小する */
 }
 
 /* --- クリックエフェクトのスタイル --- */
@@ -93,7 +123,8 @@ body {
     transform-origin: center center;
     /* 新しいアニメーションを適用 */
     animation: comet-flight 0.5s ease-out forwards;
-    animation-delay: 0.15s; /* 波紋の少し後に開始 */
+    animation-delay: 0.15s;
+    /* 波紋の少し後に開始 */
 }
 
 .effect-triangle {
@@ -116,71 +147,95 @@ body {
         transform: rotate(var(--start-angle));
         opacity: 1;
     }
+
     to {
         /* 反時計回りに180度回転 */
         transform: rotate(calc(var(--start-angle) - 180deg));
         /* 回転しきった後、指定の残存時間で消える */
         opacity: 0;
-        animation-timing-function: cubic-bezier(0.5, 1, 0.89, 1); /*
+        animation-timing-function: cubic-bezier(0.5, 1, 0.89, 1);
+        /*
         これはCSSの書き方として正しくない。opacityは別のアニメーションで制御すべき
         だが、単純化のためにこう書く。実際にはopacityはtoで0になるだけ
         */
     }
 }
+
 /* opacityを別で制御するほうがより正確 */
 @keyframes comet-flight {
     from {
         transform: rotate(var(--start-angle));
     }
+
     to {
         transform: rotate(calc(var(--start-angle) - 180deg));
     }
 }
+
 @keyframes comet-fade {
-    0% { opacity: 1; }
-    80% { opacity: 1; } /* 0.5s * 0.8 = 0.4s は表示 */
-    100% { opacity: 0; } /* 残りの0.1sで消える */
+    0% {
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    /* 0.5s * 0.8 = 0.4s は表示 */
+    100% {
+        opacity: 0;
+    }
+
+    /* 残りの0.1sで消える */
 }
+
 /* ↑上記を統合して１つのアニメーションにする。残存時間0.25秒とする */
 @keyframes comet-flight-and-fade {
     0% {
         transform: rotate(var(--start-angle));
         opacity: 1;
     }
+
     /* 0.5秒かけて半周 */
     100% {
         transform: rotate(calc(var(--start-angle) - 180deg));
         opacity: 0;
     }
 }
+
 /* 描画0.5秒、残存0.25秒。合計0.75秒 */
 @keyframes comet-flight-and-fade-v2 {
     0% {
         transform: rotate(var(--start-angle));
         opacity: 1;
     }
+
     /* 66%地点（0.5秒）で半周完了 */
     66% {
         transform: rotate(calc(var(--start-angle) - 180deg));
         opacity: 1;
     }
+
     /* 100%地点（0.75秒）で完全に消える */
     100% {
         transform: rotate(calc(var(--start-angle) - 180deg));
         opacity: 0;
     }
 }
-/* drawing-cometに適用する最終版のアニメーション */
-.drawing-comet {
-    ...
-    animation: comet-flight-and-fade-v2 0.75s ease-out forwards;
-    ...
-}
 
 
 @keyframes ripple-expand {
-    from { width: 0; height: 0; opacity: 1; }
-    to { width: 150px; height: 150px; opacity: 0; }
+    from {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+
+    to {
+        width: 150px;
+        height: 150px;
+        opacity: 0;
+    }
 }
 
 @keyframes triangle-anime {
@@ -189,14 +244,39 @@ body {
         transform: scale(0.5) rotate(var(--r-from, 0deg));
         border-bottom-color: #c1eeff;
     }
+
     30% {
         transform: scale(1.2) rotate(var(--r-from, 0deg));
         border-bottom-color: #ffffff;
         filter: drop-shadow(0 0 10px white);
     }
+
     100% {
         opacity: 0;
         transform: scale(0) rotate(var(--r-to, 360deg));
         border-bottom-color: rgba(193, 238, 255, 0.5);
     }
+}
+
+/* カウンターのスタイル */
+.counter {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    min-height: 100px;
+    background-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 10px 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.counter-digit {
+    height: 100px;
+    width: auto;
+    user-select: none;
 }

@@ -30,12 +30,57 @@ document.addEventListener('DOMContentLoaded', () => {
         do {
             nextIndex = Math.floor(Math.random() * soundFiles.length);
         } while (soundFiles.length > 1 && nextIndex === lastPlayIndex);
-        
+
         lastPlayIndex = nextIndex; // 次回の抽選のために、今回の番号を記憶
         nextSoundSrc = soundFiles[nextIndex]; // 次の音のパスを「予約」
 
         // 予約した音をプリロード開始
         new Audio(nextSoundSrc);
+    }
+
+    // --- カウンターの処理 ---
+    const counterContainer = document.getElementById('counter-container');
+    // --- 公開カウンタ（合算） ---
+    // GitHub Pages側（このHTML）ではサーバー処理ができないため、
+    // Cloudflare Workers などのAPIを用意し、そこへGET/POSTします。
+    // 設定は index.html の window.__COUNTER_API_URL__ を編集してください。
+    const COUNTER_API_URL = window.__COUNTER_API_URL__ || 'https://mahotoke-counter.mahomaho.workers.dev/counter';
+
+    async function updateCounterUI(count) {
+        if (!counterContainer) return;
+        counterContainer.innerHTML = '';
+        const countStr = count.toString().padStart(5, '0');
+        for (const digit of countStr) {
+            const digitImg = document.createElement('img');
+            digitImg.className = 'counter-digit';
+            digitImg.src = `Assets/image/${digit}.png`;
+            digitImg.alt = digit;
+            counterContainer.appendChild(digitImg);
+        }
+    }
+
+    async function fetchCounter() {
+        try {
+            const response = await fetch(COUNTER_API_URL);
+            if (response.ok) {
+                const data = await response.json();
+                updateCounterUI(data.count);
+            }
+        } catch (error) {
+            console.error('Failed to fetch counter:', error);
+        }
+    }
+
+    async function incrementCounter() {
+        try {
+            const response = await fetch(COUNTER_API_URL, { method: 'POST' });
+            if (response.ok) {
+                const data = await response.json();
+                updateCounterUI(data.count);
+            }
+        } catch (error) {
+            console.error('Failed to increment counter:', error);
+        }
     }
 
     // --- ボタンが押された時の処理 ---
@@ -49,6 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
             audio.play().catch(error => console.error("Audio playback failed:", error));
         }
 
+        incrementCounter(); // カウンターを増やす
         prepareNextSound();
     };
 
@@ -88,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.appendChild(ripple);
 
         // 三角形の数を3または4でランダムに決定
-        const numTriangles = Math.floor(Math.random() * 2) + 3; 
+        const numTriangles = Math.floor(Math.random() * 2) + 3;
         for (let i = 0; i < numTriangles; i++) {
             const tri = document.createElement('div');
             tri.className = 'effect-triangle';
@@ -161,4 +207,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 初期化 ---
     prepareNextSound();
+    fetchCounter(); // 初回読み込み時にカウンターを取得
 });

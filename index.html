@@ -1,14 +1,23 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>まほとけボタン</title>
     <link rel="stylesheet" href="style.css">
 
+    <!-- 公開カウンタ（合算）のAPI URL（Cloudflare Workers など） -->
+    <!-- 例: https://mahotoke-counter.<your-subdomain>.workers.dev/counter -->
+    <script>
+        // TODO: デプロイ後のWorker URLに差し替えてください。
+        window.__COUNTER_API_URL__ = 'https://mahotoke-counter.mahomaho.workers.dev/counter';
+    </script>
+
     <script src="script.js" defer></script>
 
-    </head>
+</head>
+
 <body>
     <!-------------------------------------------------------------mahotoke----------------------------------------------------------------                                                                                                                                                      
                 ==                                                                                                                   =                
@@ -22,11 +31,13 @@
          %%     %& +#@+                         #+  %%    %#%@%              +##       #+  %%    %#%@%              +##                               
          +#%++&##    =&&                        #&  +#&++&#+  +&       =%##%&+=        #&  +#&++&#+  +&       =%##%&+=              %#+               
            =+&+=                                +=    =&&+                             +=    =&&+                                   +&=        
--------------------------------------------------------------------mahotoke---------------------------------------------------------------->   
+-------------------------------------------------------------------mahotoke---------------------------------------------------------------->
     <div class="container">
         <img id="mahotokeImageButton" src="Assets/image/mahotoke_normal.png" alt="まほとけボタン" tabindex="0" role="button">
+        <div id="counter-container" class="counter"></div>
     </div>
 
     <audio id="mahotokeAudio" preload="auto" style="display:none;"></audio>
 </body>
+
 </html>
