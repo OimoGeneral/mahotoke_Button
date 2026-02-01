@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Error: Required HTML elements not found!');
         return;
     }
+    mahotokeButton.setAttribute('draggable', 'false');
 
     // --- 音声ファイルリストの自動生成 ---
     // soundフォルダにある音声ファイルの総数をここに設定してください。
@@ -75,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(COUNTER_API_URL);
             if (response.ok) {
                 const data = await response.json();
-                updateCounterUI(data.count);
+                reconcileCounter(data.count);
             }
         } catch (error) {
             console.error('Failed to fetch counter:', error);
@@ -84,9 +85,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let latestCounterRequestId = 0;
 
+
     async function incrementCounter() {
         // 楽観的更新: サーバーの結果を待たずにUIを増やす
-        updateCounterUI(currentCount + 1);
+        pendingIncrements += 1;
+        updateCounterUI(lastServerCount + pendingIncrements);
+
+        const requestId = ++latestCounterRequestId;
 
         const requestId = ++latestCounterRequestId;
 
@@ -96,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 // 直近のリクエストのみ反映して、古い応答での巻き戻りを防ぐ
                 if (requestId === latestCounterRequestId) {
-                    updateCounterUI(data.count);
+
                 }
             }
         } catch (error) {
@@ -129,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         pressButton();
     }, { passive: false });
+
     mahotokeButton.addEventListener('pointerup', releaseButton);
     mahotokeButton.addEventListener('pointerleave', releaseButton);
     mahotokeButton.addEventListener('pointercancel', releaseButton);
