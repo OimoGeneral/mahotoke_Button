@@ -84,21 +84,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let latestCounterRequestId = 0;
-    let lastServerCount = 0;
-    let pendingIncrements = 0;
 
-    function reconcileCounter(serverCount) {
-        const safeServerCount = Math.max(lastServerCount, serverCount);
-        const confirmedDelta = safeServerCount - lastServerCount;
-        lastServerCount = safeServerCount;
-        pendingIncrements = Math.max(0, pendingIncrements - confirmedDelta);
-        updateCounterUI(lastServerCount + pendingIncrements);
-    }
 
     async function incrementCounter() {
         // 楽観的更新: サーバーの結果を待たずにUIを増やす
         pendingIncrements += 1;
         updateCounterUI(lastServerCount + pendingIncrements);
+
+        const requestId = ++latestCounterRequestId;
 
         const requestId = ++latestCounterRequestId;
 
@@ -108,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 // 直近のリクエストのみ反映して、古い応答での巻き戻りを防ぐ
                 if (requestId === latestCounterRequestId) {
-                    reconcileCounter(data.count);
+
                 }
             }
         } catch (error) {
@@ -141,12 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         pressButton();
     }, { passive: false });
-    mahotokeButton.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-    });
-    mahotokeButton.addEventListener('dragstart', (e) => {
-        e.preventDefault();
-    });
+
     mahotokeButton.addEventListener('pointerup', releaseButton);
     mahotokeButton.addEventListener('pointerleave', releaseButton);
     mahotokeButton.addEventListener('pointercancel', releaseButton);
