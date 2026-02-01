@@ -82,16 +82,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    let latestCounterRequestId = 0;
+
     async function incrementCounter() {
         // 楽観的更新: サーバーの結果を待たずにUIを増やす
         updateCounterUI(currentCount + 1);
+
+        const requestId = ++latestCounterRequestId;
 
         try {
             const response = await fetch(COUNTER_API_URL, { method: 'POST' });
             if (response.ok) {
                 const data = await response.json();
-                // サーバーの正確な値で同期（誤差があれば修正される）
-                updateCounterUI(data.count);
+                // 直近のリクエストのみ反映して、古い応答での巻き戻りを防ぐ
+                if (requestId === latestCounterRequestId) {
+                    updateCounterUI(data.count);
+                }
             }
         } catch (error) {
             console.error('Failed to increment counter:', error);
