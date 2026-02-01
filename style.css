@@ -40,6 +40,13 @@ body {
 
     /* ダブルタップズームなどの防止 */
     touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    /* タップ時のハイライトを無効化 */
+    -webkit-touch-callout: none;
+    /* iOSの長押しメニューを抑制 */
+    -webkit-user-select: none;
+    user-select: none;
+    /* ページ全体の選択を無効化 */
 }
 
 /* コンテンツを中央に配置するためのコンテナ */
@@ -78,6 +85,12 @@ body {
     /* Firefox向け */
     -ms-user-select: none;
     /* IE/Edge向け */
+    -webkit-tap-highlight-color: transparent;
+    /* タップ時の青いハイライトを無効化 */
+    -webkit-user-drag: none;
+    /* 画像のドラッグを防止 */
+    outline: none;
+    /* フォーカス時の枠線を抑制 */
 
     /* アニメーション：縮小エフェクトをスムーズにする */
     transition: transform 0.1s ease-out;
