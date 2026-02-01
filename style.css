@@ -78,6 +78,12 @@ body {
     /* Firefox向け */
     -ms-user-select: none;
     /* IE/Edge向け */
+    -webkit-tap-highlight-color: transparent;
+    /* タップ時の青いハイライトを無効化 */
+    -webkit-user-drag: none;
+    /* 画像のドラッグを防止 */
+    outline: none;
+    /* フォーカス時の枠線を抑制 */
 
     /* アニメーション：縮小エフェクトをスムーズにする */
     transition: transform 0.1s ease-out;
