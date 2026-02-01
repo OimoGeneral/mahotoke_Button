@@ -84,6 +84,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let latestCounterRequestId = 0;
+    let lastServerCount = 0;
+    let pendingIncrements = 0;
+
+    function reconcileCounter(serverCount) {
+        lastServerCount = serverCount;
+        pendingIncrements = 0;
+        updateCounterUI(serverCount);
+    }
 
 
     async function incrementCounter() {
@@ -93,15 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const requestId = ++latestCounterRequestId;
 
-        const requestId = ++latestCounterRequestId;
-
         try {
             const response = await fetch(COUNTER_API_URL, { method: 'POST' });
             if (response.ok) {
                 const data = await response.json();
                 // 直近のリクエストのみ反映して、古い応答での巻き戻りを防ぐ
                 if (requestId === latestCounterRequestId) {
-
+                    reconcileCounter(data.count);
                 }
             }
         } catch (error) {
