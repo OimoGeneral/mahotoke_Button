@@ -119,12 +119,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- ボタンのイベントリスナー設定 ---
-    mahotokeButton.addEventListener('mousedown', pressButton);
-    mahotokeButton.addEventListener('mouseup', releaseButton);
-    mahotokeButton.addEventListener('mouseleave', releaseButton);
-    mahotokeButton.addEventListener('touchstart', (e) => { e.preventDefault(); pressButton(); }, { passive: false });
-    mahotokeButton.addEventListener('touchend', releaseButton);
-    mahotokeButton.addEventListener('touchcancel', releaseButton);
+    mahotokeButton.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        pressButton();
+    }, { passive: false });
+    mahotokeButton.addEventListener('pointerup', releaseButton);
+    mahotokeButton.addEventListener('pointerleave', releaseButton);
+    mahotokeButton.addEventListener('pointercancel', releaseButton);
     mahotokeButton.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
