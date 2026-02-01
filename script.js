@@ -82,16 +82,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    let latestCounterRequestId = 0;
+
     async function incrementCounter() {
         // 楽観的更新: サーバーの結果を待たずにUIを増やす
         updateCounterUI(currentCount + 1);
+
+        const requestId = ++latestCounterRequestId;
 
         try {
             const response = await fetch(COUNTER_API_URL, { method: 'POST' });
             if (response.ok) {
                 const data = await response.json();
-                // サーバーの正確な値で同期（誤差があれば修正される）
-                updateCounterUI(data.count);
+                // 直近のリクエストのみ反映して、古い応答での巻き戻りを防ぐ
+                if (requestId === latestCounterRequestId) {
+                    updateCounterUI(data.count);
+                }
             }
         } catch (error) {
             console.error('Failed to increment counter:', error);
@@ -119,12 +125,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- ボタンのイベントリスナー設定 ---
-    mahotokeButton.addEventListener('mousedown', pressButton);
-    mahotokeButton.addEventListener('mouseup', releaseButton);
-    mahotokeButton.addEventListener('mouseleave', releaseButton);
-    mahotokeButton.addEventListener('touchstart', (e) => { e.preventDefault(); pressButton(); }, { passive: false });
-    mahotokeButton.addEventListener('touchend', releaseButton);
-    mahotokeButton.addEventListener('touchcancel', releaseButton);
+    mahotokeButton.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        pressButton();
+    }, { passive: false });
+    mahotokeButton.addEventListener('pointerup', releaseButton);
+    mahotokeButton.addEventListener('pointerleave', releaseButton);
+    mahotokeButton.addEventListener('pointercancel', releaseButton);
     mahotokeButton.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
