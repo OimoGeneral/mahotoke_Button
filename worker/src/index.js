@@ -38,8 +38,9 @@ export default {
                 `).run();
 
                 // clicks テーブルにも記録（期間集計用）
+                // clicked_at は UTC で保存し、集計時に JST (+9h) に変換する
                 await env.DB.prepare(
-                    "INSERT INTO clicks (clicked_at) VALUES (datetime('now', '+9 hours'))"
+                    "INSERT INTO clicks (clicked_at) VALUES (datetime('now'))"
                 ).run();
 
                 const row = await env.DB.prepare(
@@ -52,15 +53,17 @@ export default {
         }
 
         // --- 期間別カウンタ ---
+        // clicked_at は UTC で保存されている。
+        // クエリ時に +9 hours して JST 日付に変換して比較する。
         if (url.pathname === "/counter/stats" && request.method === "GET") {
             // 今日 (JST)
             const todayRow = await env.DB.prepare(
-                "SELECT COUNT(*) AS cnt FROM clicks WHERE date(clicked_at) = date('now', '+9 hours')"
+                "SELECT COUNT(*) AS cnt FROM clicks WHERE date(clicked_at, '+9 hours') = date('now', '+9 hours')"
             ).first();
 
             // 昨日 (JST)
             const yesterdayRow = await env.DB.prepare(
-                "SELECT COUNT(*) AS cnt FROM clicks WHERE date(clicked_at) = date('now', '+9 hours', '-1 day')"
+                "SELECT COUNT(*) AS cnt FROM clicks WHERE date(clicked_at, '+9 hours') = date('now', '+9 hours', '-1 day')"
             ).first();
 
             // 今週 (月曜始まり, JST)
@@ -68,13 +71,13 @@ export default {
             // (w + 6) % 7 で月曜=0 にシフトし、その日数分だけ遡る
             const thisWeekRow = await env.DB.prepare(`
                 SELECT COUNT(*) AS cnt FROM clicks
-                WHERE date(clicked_at) >= date('now', '+9 hours', '-' || ((strftime('%w', 'now', '+9 hours') + 6) % 7) || ' days')
-                  AND date(clicked_at) <= date('now', '+9 hours')
+                WHERE date(clicked_at, '+9 hours') >= date('now', '+9 hours', '-' || ((strftime('%w', 'now', '+9 hours') + 6) % 7) || ' days')
+                  AND date(clicked_at, '+9 hours') <= date('now', '+9 hours')
             `).first();
 
             // 今月 (JST)
             const thisMonthRow = await env.DB.prepare(
-                "SELECT COUNT(*) AS cnt FROM clicks WHERE strftime('%Y-%m', clicked_at) = strftime('%Y-%m', 'now', '+9 hours')"
+                "SELECT COUNT(*) AS cnt FROM clicks WHERE strftime('%Y-%m', clicked_at, '+9 hours') = strftime('%Y-%m', 'now', '+9 hours')"
             ).first();
 
             return new Response(JSON.stringify({
@@ -88,3 +91,4 @@ export default {
         return new Response("Not Found", { status: 404, headers: corsHeaders });
     },
 };
+
