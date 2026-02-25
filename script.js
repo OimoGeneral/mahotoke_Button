@@ -113,6 +113,41 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Failed to increment counter:', error);
         }
+
+        // 期間別カウンタも更新
+        fetchStats();
+    }
+
+    // --- 期間別カウンタの処理 ---
+    const STATS_API_URL = COUNTER_API_URL.replace(/\/counter\/?$/, '/counter/stats');
+    const statMonth = document.getElementById('stat-month');
+    const statWeek = document.getElementById('stat-week');
+    const statYesterday = document.getElementById('stat-yesterday');
+    const statToday = document.getElementById('stat-today');
+
+    async function fetchStats() {
+        try {
+            const response = await fetch(STATS_API_URL);
+            if (!response.ok) return;
+            const data = await response.json();
+
+            updateStatValue(statMonth, data.this_month);
+            updateStatValue(statWeek, data.this_week);
+            updateStatValue(statYesterday, data.yesterday);
+            updateStatValue(statToday, data.today);
+        } catch (error) {
+            console.error('Failed to fetch stats:', error);
+        }
+    }
+
+    function updateStatValue(element, value) {
+        if (!element) return;
+        const formatted = Number(value).toLocaleString();
+        if (element.textContent !== formatted) {
+            element.textContent = formatted;
+            element.classList.add('updating');
+            setTimeout(() => element.classList.remove('updating'), 300);
+        }
     }
 
     // --- ボタンが押された時の処理 ---
@@ -245,4 +280,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 初期化 ---
     prepareNextSound();
     fetchCounter(); // 初回読み込み時にカウンターを取得
+    fetchStats();   // 期間別カウンタも取得
 });
