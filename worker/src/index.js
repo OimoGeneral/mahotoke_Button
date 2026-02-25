@@ -39,7 +39,7 @@ export default {
 
                 // clicks テーブルにも記録（期間集計用）
                 await env.DB.prepare(
-                    "INSERT INTO clicks (clicked_at) VALUES (datetime('now'))"
+                    "INSERT INTO clicks (clicked_at) VALUES (datetime('now', '+9 hours'))"
                 ).run();
 
                 const row = await env.DB.prepare(
@@ -53,28 +53,28 @@ export default {
 
         // --- 期間別カウンタ ---
         if (url.pathname === "/counter/stats" && request.method === "GET") {
-            // 今日 (UTC)
+            // 今日 (JST)
             const todayRow = await env.DB.prepare(
-                "SELECT COUNT(*) AS cnt FROM clicks WHERE date(clicked_at) = date('now')"
+                "SELECT COUNT(*) AS cnt FROM clicks WHERE date(clicked_at) = date('now', '+9 hours')"
             ).first();
 
-            // 昨日 (UTC)
+            // 昨日 (JST)
             const yesterdayRow = await env.DB.prepare(
-                "SELECT COUNT(*) AS cnt FROM clicks WHERE date(clicked_at) = date('now', '-1 day')"
+                "SELECT COUNT(*) AS cnt FROM clicks WHERE date(clicked_at) = date('now', '+9 hours', '-1 day')"
             ).first();
 
-            // 今週 (月曜始まり, UTC)
+            // 今週 (月曜始まり, JST)
             // strftime('%w') → 日曜=0, 月=1 ... 土=6
             // (w + 6) % 7 で月曜=0 にシフトし、その日数分だけ遡る
             const thisWeekRow = await env.DB.prepare(`
                 SELECT COUNT(*) AS cnt FROM clicks
-                WHERE date(clicked_at) >= date('now', '-' || ((strftime('%w', 'now') + 6) % 7) || ' days')
-                  AND date(clicked_at) <= date('now')
+                WHERE date(clicked_at) >= date('now', '+9 hours', '-' || ((strftime('%w', 'now', '+9 hours') + 6) % 7) || ' days')
+                  AND date(clicked_at) <= date('now', '+9 hours')
             `).first();
 
-            // 今月 (UTC)
+            // 今月 (JST)
             const thisMonthRow = await env.DB.prepare(
-                "SELECT COUNT(*) AS cnt FROM clicks WHERE strftime('%Y-%m', clicked_at) = strftime('%Y-%m', 'now')"
+                "SELECT COUNT(*) AS cnt FROM clicks WHERE strftime('%Y-%m', clicked_at) = strftime('%Y-%m', 'now', '+9 hours')"
             ).first();
 
             return new Response(JSON.stringify({
