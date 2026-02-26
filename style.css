@@ -15,8 +15,10 @@ body {
     /* Flexboxを使用し、子要素を配置 */
     justify-content: center;
     /* 水平方向の中央揃え */
-    align-items: center;
-    /* 垂直方向の中央揃え */
+    align-items: flex-end;
+    /* 垂直方向を下寄せにして背景キャラの顔が見えるようにする */
+    padding-bottom: 5vh;
+    /* 下に少し余白を確保 */
     min-height: 100vh;
     /* ビューポートの高さ全体を使用 */
     margin: 0;
