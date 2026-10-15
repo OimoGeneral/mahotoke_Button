@@ -1,28 +1,37 @@
 const STATS_SQL = `
     WITH bounds AS (
         SELECT
-            datetime('now', '+9 hours', 'start of day', '-9 hours') AS today_start,
-            datetime('now', '+9 hours', 'start of day', '-33 hours') AS yesterday_start,
-            datetime(
-                'now', '+9 hours', 'start of day',
-                '-' || ((strftime('%w', 'now', '+9 hours') + 6) % 7) || ' days',
-                '-9 hours'
+            date('now', '+9 hours') AS today,
+            date('now', '+9 hours', '-1 day') AS yesterday,
+            date(
+                'now', '+9 hours',
+                '-' || ((strftime('%w', 'now', '+9 hours') + 6) % 7) || ' days'
             ) AS week_start,
-            datetime('now', '+9 hours', 'start of month', '-9 hours') AS month_start,
-            datetime('now', '+9 hours', 'start of day', '+15 hours') AS tomorrow_start
+            date('now', '+9 hours', 'start of month') AS month_start
     ),
-    recent_clicks AS (
-        SELECT clicks.clicked_at, bounds.*
-        FROM clicks CROSS JOIN bounds
-        WHERE clicks.clicked_at >= min(bounds.week_start, bounds.month_start)
-          AND clicks.clicked_at < bounds.tomorrow_start
+    recent_days AS (
+        SELECT daily_counts.day, daily_counts.count, bounds.*
+        FROM daily_counts CROSS JOIN bounds
+        WHERE daily_counts.day >= min(bounds.week_start, bounds.month_start)
+          AND daily_counts.day <= bounds.today
     )
     SELECT
-        coalesce(sum(CASE WHEN clicked_at >= today_start THEN 1 ELSE 0 END), 0) AS today,
-        coalesce(sum(CASE WHEN clicked_at >= yesterday_start AND clicked_at < today_start THEN 1 ELSE 0 END), 0) AS yesterday,
-        coalesce(sum(CASE WHEN clicked_at >= week_start THEN 1 ELSE 0 END), 0) AS this_week,
-        coalesce(sum(CASE WHEN clicked_at >= month_start THEN 1 ELSE 0 END), 0) AS this_month
-    FROM recent_clicks
+        coalesce(sum(CASE WHEN day = today THEN count ELSE 0 END), 0) AS today,
+        coalesce(sum(CASE WHEN day = yesterday THEN count ELSE 0 END), 0) AS yesterday,
+        coalesce(sum(CASE WHEN day >= week_start THEN count ELSE 0 END), 0) AS this_week,
+        coalesce(sum(CASE WHEN day >= month_start THEN count ELSE 0 END), 0) AS this_month
+    FROM recent_days
+`;
+
+const COUNTER_STATS_SQL = `
+    WITH stats AS (${STATS_SQL})
+    SELECT
+        coalesce((SELECT count FROM counts WHERE id = 'main'), 0) AS count,
+        stats.today,
+        stats.yesterday,
+        stats.this_week,
+        stats.this_month
+    FROM stats
 `;
 
 function firstResult(result) {
@@ -53,14 +62,13 @@ export default {
         // --- 合計カウンタ ---
         if (url.pathname === "/counter") {
             if (request.method === "GET") {
-                const [countResult, statsResult] = await env.DB.batch([
-                    env.DB.prepare("SELECT count FROM counts WHERE id = ?").bind("main"),
-                    env.DB.prepare(STATS_SQL),
-                ]);
-
-                return new Response(JSON.stringify({
-                    count: firstResult(countResult).count ?? 0,
-                    ...firstResult(statsResult),
+                const result = await env.DB.prepare(COUNTER_STATS_SQL).first();
+                return new Response(JSON.stringify(result ?? {
+                    count: 0,
+                    today: 0,
+                    yesterday: 0,
+                    this_week: 0,
+                    this_month: 0,
                 }), { headers: jsonHeaders });
             }
 
@@ -72,12 +80,15 @@ export default {
                         ON CONFLICT(id) DO UPDATE SET count = count + 1
                     `),
                     env.DB.prepare("INSERT INTO clicks (clicked_at) VALUES (datetime('now'))"),
-                    env.DB.prepare("SELECT count FROM counts WHERE id = ?").bind("main"),
-                    env.DB.prepare(STATS_SQL),
+                    env.DB.prepare(`
+                        INSERT INTO daily_counts (day, count)
+                        VALUES (date('now', '+9 hours'), 1)
+                        ON CONFLICT(day) DO UPDATE SET count = count + 1
+                    `),
+                    env.DB.prepare(COUNTER_STATS_SQL),
                 ]);
 
                 return new Response(JSON.stringify({
-                    count: firstResult(results[2]).count ?? 0,
                     ...firstResult(results[3]),
                 }), { headers: jsonHeaders });
             }

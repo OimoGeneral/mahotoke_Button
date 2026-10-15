@@ -11,3 +11,8 @@ CREATE TABLE IF NOT EXISTS clicks (
 );
 
 CREATE INDEX IF NOT EXISTS idx_clicks_clicked_at ON clicks(clicked_at);
+
+CREATE TABLE IF NOT EXISTS daily_counts (
+  day TEXT PRIMARY KEY,
+  count INTEGER NOT NULL DEFAULT 0
+);
