@@ -72,15 +72,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function fetchCounter() {
+        let statsLoaded = false;
         try {
             const response = await fetch(COUNTER_API_URL);
             if (response.ok) {
                 const data = await response.json();
                 reconcileCounter(data.count);
+                if (hasStats(data)) {
+                    updateStats(data);
+                    statsLoaded = true;
+                }
             }
         } catch (error) {
             console.error('Failed to fetch counter:', error);
         }
+        if (!statsLoaded) fetchStats();
     }
 
     let latestCounterRequestId = 0;
@@ -100,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCounterUI(lastServerCount + pendingIncrements);
 
         const requestId = ++latestCounterRequestId;
+        let statsLoaded = false;
 
         try {
             const response = await fetch(COUNTER_API_URL, { method: 'POST' });
@@ -108,14 +115,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 直近のリクエストのみ反映して、古い応答での巻き戻りを防ぐ
                 if (requestId === latestCounterRequestId) {
                     reconcileCounter(data.count);
+                    if (hasStats(data)) {
+                        updateStats(data);
+                        statsLoaded = true;
+                    }
                 }
             }
         } catch (error) {
             console.error('Failed to increment counter:', error);
         }
 
-        // 期間別カウンタも更新
-        fetchStats();
+        // 古い Worker との互換性を保ち、統計がレスポンスにない場合だけ別取得する
+        if (requestId === latestCounterRequestId && !statsLoaded) fetchStats();
     }
 
     // --- 期間別カウンタの処理 ---
@@ -131,13 +142,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) return;
             const data = await response.json();
 
-            updateStatValue(statMonth, data.this_month);
-            updateStatValue(statWeek, data.this_week);
-            updateStatValue(statYesterday, data.yesterday);
-            updateStatValue(statToday, data.today);
+            updateStats(data);
         } catch (error) {
             console.error('Failed to fetch stats:', error);
         }
+    }
+
+    function hasStats(data) {
+        return ['this_month', 'this_week', 'yesterday', 'today']
+            .every(key => Number.isFinite(Number(data[key])));
+    }
+
+    function updateStats(data) {
+        updateStatValue(statMonth, data.this_month);
+        updateStatValue(statWeek, data.this_week);
+        updateStatValue(statYesterday, data.yesterday);
+        updateStatValue(statToday, data.today);
     }
 
     function updateStatValue(element, value) {
@@ -154,6 +174,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const pressButton = () => {
         if (mahotokeButton.classList.contains('button-active')) return;
         mahotokeButton.classList.add('button-active');
+
+        // 起動時の先読みがまだ完了していない場合も、初回クリックで再生対象を用意する
+        if (!nextSoundSrc) {
+            prepareNextSound();
+        }
 
         if (nextSoundSrc) {
             audio.src = nextSoundSrc;
@@ -280,5 +305,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 初期化 ---
     prepareNextSound();
     fetchCounter(); // 初回読み込み時にカウンターを取得
-    fetchStats();   // 期間別カウンタも取得
 });

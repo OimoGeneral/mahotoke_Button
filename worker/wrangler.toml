@@ -5,9 +5,9 @@ compatibility_date = "2024-01-01"
 [vars]
 # GitHub Pages の origin（パスは含めない）
 # 例: "https://username.github.io"
-ALLOW_ORIGIN = "https://username.github.io"
+ALLOW_ORIGIN = "https://oimogeneral.github.io"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "mahotoke_db"
-database_id = "YOUR_D1_DATABASE_ID" # User needs to fill this
+database_name = "counter"
+database_id = "315aef40-fb97-4d96-95f9-aa2065cb8225"

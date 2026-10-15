@@ -9,3 +9,5 @@ CREATE TABLE IF NOT EXISTS clicks (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   clicked_at TEXT DEFAULT (datetime('now'))
 );
+
+CREATE INDEX IF NOT EXISTS idx_clicks_clicked_at ON clicks(clicked_at);
